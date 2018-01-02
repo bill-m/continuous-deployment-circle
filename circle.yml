@@ -13,7 +13,7 @@ machine:
     PYTHONPATH: ${PYTHONPATH}:${HOME}/google_appengine
 
     # Replace this with your project ID
-    GCLOUD_PROJECT: "continuous-deployment-circle"
+    GCLOUD_PROJECT: "bill-deploytest"
 
 dependencies:
   pre:
