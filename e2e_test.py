@@ -14,12 +14,20 @@ Replace HOST with the URL your project will be deployed to.
 
 import urllib2
 import logging
+import sys
 
 # The circle.yml deploys to version 1, which maps to this URL
-HOST='https://bill-deploytest.appspot.com/'
+HOST='bill-deploytest.appspot.com'
+
+if len(sys.argv) > 1:
+    testurl = "https://{}-dot-{}".format(sys.argv[1], HOST)
+else:
+    testurl = "https://{}".format(HOST)
+
+print(testurl)
 
 # [START e2e]
-response = urllib2.urlopen("{}/get_author/ulysses".format(HOST))
+response = urllib2.urlopen("{}/get_author/ulysses".format(testurl))
 html = response.read()
 assert(html == "James Joyce")
 # [END e2e]
