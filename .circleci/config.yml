@@ -20,7 +20,7 @@ jobs:
           name: UpdateSDK
           command: |
             # Make sure gcloud is up to date
-            gcloud --quiet components update
+            # gcloud --quiet components update
       - run:
           name: PythonEnv
           command: |
