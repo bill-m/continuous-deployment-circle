@@ -5,8 +5,8 @@ jobs:
       - image: google/cloud-sdk
         environment:
           # Add app engine sdk to pythonpath for local unit tests.
-          PYTHONPATH: ${PYTHONPATH}:${HOME}/google_appengine
-          GCLOUD_PROJECT: "bill-deploytest"
+          PYTHONPATH: /usr/lib/google-cloud-sdk/platform/google_appengine
+          GCLOUD_PROJECT: bill-deploytest
     steps:
       - checkout
       - run:
@@ -16,15 +16,6 @@ jobs:
             echo $START_TIME
             echo $CLIENT_SECRET | base64 --decode -i > ${HOME}/client-secret.json
             sed  s/YOUR-API-KEY/$API_KEY/ api_key.py.sample > api_key.py
-      - run:
-          command: apt-get install unzip
-      - run:
-          name: DownloadSDK
-          command: |
-            curl -o $HOME/google_appengine_1.9.65.zip https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.65.zip
-            unzip -q -d $HOME $HOME/google_appengine_1.9.65.zip
-            # Make sure gcloud is up to date
-            # gcloud --quiet components update
       - run:
           name: PythonEnv
           command: |
