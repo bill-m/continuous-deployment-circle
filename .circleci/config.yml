@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:2.7.13
+      - image: google/cloud-sdk
         environment:
           # Add app engine sdk to pythonpath for local unit tests.
           PYTHONPATH: ${PYTHONPATH}:${HOME}/google_appengine
