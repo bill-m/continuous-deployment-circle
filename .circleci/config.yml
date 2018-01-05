@@ -6,14 +6,12 @@ jobs:
         environment:
           # Add app engine sdk to pythonpath for local unit tests.
           PYTHONPATH: /usr/lib/google-cloud-sdk/platform/google_appengine
-          GCLOUD_PROJECT: bill-deploytest
+          GCLOUD_PROJECT: "bill-deploytest"
     steps:
       - checkout
       - run:
           name: SetEnvVars
           command: |
-            bash .circleci/setenv.sh
-            echo $START_TIME
             echo $CLIENT_SECRET | base64 --decode -i > ${HOME}/client-secret.json
             sed  s/YOUR-API-KEY/$API_KEY/ api_key.py.sample > api_key.py
       - run:
@@ -34,9 +32,9 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               # deploy to AppEngine
-              gcloud -q app deploy app.yaml --no-promote --version=$START_TIME
+              gcloud -q app deploy app.yaml --no-promote --version=${CIRCLE_BUILD_NUM}
               # Run our E2E Test against the latest version
               python e2e_test.py $START_TIME
               # If OK, promote latest version
-              gcloud -q app services set-traffic --splits $START_TIME=1
+              gcloud -q app services set-traffic --splits ${CIRCLE_BUILD_NUM}=1
             fi
