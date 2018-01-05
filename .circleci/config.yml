@@ -34,7 +34,7 @@ jobs:
               # deploy to AppEngine
               gcloud -q app deploy app.yaml --no-promote --version=${CIRCLE_BUILD_NUM}
               # Run our E2E Test against the latest version
-              python e2e_test.py $START_TIME
+              python e2e_test.py ${CIRCLE_BUILD_NUM}
               # If OK, promote latest version
               gcloud -q app services set-traffic --splits ${CIRCLE_BUILD_NUM}=1
             fi

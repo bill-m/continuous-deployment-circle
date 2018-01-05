@@ -27,7 +27,7 @@ else:
 print(testurl)
 
 # [START e2e]
-response = urllib2.urlopen("{}/get_author/ulysses".format(testurl))
+response = urllib2.urlopen("{}/get_author/thejungle".format(testurl))
 html = response.read()
 assert(html == "James Joyce")
 # [END e2e]
