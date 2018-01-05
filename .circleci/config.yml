@@ -10,42 +10,42 @@ jobs:
     steps:
       - checkout
       - run:
-        name: SetEnvVars
-        command: |
-          bash .circleci/setenv.sh
-          echo $START_TIME
-          echo $CLIENT_SECRET | base64 --decode -i > ${HOME}/client-secret.json
-          sed  s/YOUR-API-KEY/$API_KEY/ api_key.py.sample > api_key.py
+          name: SetEnvVars
+          command: |
+            bash .circleci/setenv.sh
+            echo $START_TIME
+            echo $CLIENT_SECRET | base64 --decode -i > ${HOME}/client-secret.json
+            sed  s/YOUR-API-KEY/$API_KEY/ api_key.py.sample > api_key.py
       - run:
-        command: apt-get install unzip
+          command: apt-get install unzip
       - run:
-        name: DownloadSDK
-        command: |
-          curl -o $HOME/google_appengine_1.9.65.zip https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.65.zip
-          unzip -q -d $HOME $HOME/google_appengine_1.9.65.zip
-          # Make sure gcloud is up to date
-          # gcloud --quiet components update
+          name: DownloadSDK
+          command: |
+            curl -o $HOME/google_appengine_1.9.65.zip https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.65.zip
+            unzip -q -d $HOME $HOME/google_appengine_1.9.65.zip
+            # Make sure gcloud is up to date
+            # gcloud --quiet components update
       - run:
-        name: PythonEnv
-        command: |
-          mkdir -p lib
-          pip install -r requirements.txt -t lib
-          # authenticate and configure gcloud project
-          gcloud auth activate-service-account --key-file ${HOME}/client-secret.json
-          gcloud config set project $GCLOUD_PROJECT
+          name: PythonEnv
+          command: |
+            mkdir -p lib
+            pip install -r requirements.txt -t lib
+            # authenticate and configure gcloud project
+            gcloud auth activate-service-account --key-file ${HOME}/client-secret.json
+            gcloud config set project $GCLOUD_PROJECT
       - run:
-        name: LocalTest
-        command: |
-          # run local unit tests
-          python test_main.py
+          name: LocalTest
+          command: |
+            # run local unit tests
+            python test_main.py
       - deploy:
-        name: Deploy Master to GCP
-        command: |
-          if [ "${CIRCLE_BRANCH}" == "master" ]; then
-            # deploy to AppEngine
-            gcloud -q app deploy app.yaml --no-promote --version=$START_TIME
-            # Run our E2E Test against the latest version
-            python e2e_test.py $START_TIME
-            # If OK, promote latest version
-            gcloud -q app services set-traffic --splits $START_TIME=1
-          fi
+          name: Deploy Master to GCP
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              # deploy to AppEngine
+              gcloud -q app deploy app.yaml --no-promote --version=$START_TIME
+              # Run our E2E Test against the latest version
+              python e2e_test.py $START_TIME
+              # If OK, promote latest version
+              gcloud -q app services set-traffic --splits $START_TIME=1
+            fi
