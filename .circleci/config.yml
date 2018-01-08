@@ -10,9 +10,11 @@ jobs:
     steps:
       - checkout
       - run:
+          context: org-global
           name: SetEnvVars
           command: |
-            echo $CLIENT_SECRET | base64 --decode -i > ${HOME}/client-secret.json
+#            echo $CLIENT_SECRET | base64 --decode -i > ${HOME}/client-secret.json
+            echo $GLOBAL_SECRET | base64 --decode -i > ${HOME}/client-secret.json
             sed  s/YOUR-API-KEY/$API_KEY/ api_key.py.sample > api_key.py
       - run:
           name: PythonEnv
