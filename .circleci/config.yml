@@ -10,10 +10,8 @@ jobs:
     steps:
       - checkout
       - run:
-          context: org-global
           name: SetEnvVars
-          command: |
-#            echo $CLIENT_SECRET | base64 --decode -i > ${HOME}/client-secret.json
+            # echo $CLIENT_SECRET | base64 --decode -i > ${HOME}/client-secret.json
             echo $GLOBAL_SECRET | base64 --decode -i > ${HOME}/client-secret.json
             sed  s/YOUR-API-KEY/$API_KEY/ api_key.py.sample > api_key.py
       - run:
@@ -40,3 +38,10 @@ jobs:
               # If OK, promote latest version
               gcloud -q app services set-traffic --splits ${CIRCLE_BUILD_NUM}=1
             fi
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build
+          context: org-global
