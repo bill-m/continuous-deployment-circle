@@ -6,7 +6,7 @@ jobs:
         environment:
           # Add app engine sdk to pythonpath for local unit tests.
           GCP_SDK_PATH: /usr/lib/google-cloud-sdk
-		  PYTHONPATH: ${GCP_SDK_PATH}/platform/google_appengine
+          PYTHONPATH: ${GCP_SDK_PATH}/platform/google_appengine
           GCLOUD_PROJECT: "bill-deploytest"
     steps:
       - checkout
@@ -14,7 +14,7 @@ jobs:
           name: SetEnvVars
           command: |
             # echo $CLIENT_SECRET | base64 --decode -i > ${HOME}/client-secret.json
-			echo $PYTHONPATH
+            echo $PYTHONPATH
             echo $GLOBAL_SECRET | base64 --decode -i > ${HOME}/client-secret.json
             sed  s/YOUR-API-KEY/$API_KEY/ api_key.py.sample > api_key.py
       - run:
