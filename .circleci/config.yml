@@ -6,7 +6,7 @@ jobs:
         environment:
           # Add app engine sdk to pythonpath for local unit tests.
           GCP_SDK_PATH: /usr/lib/google-cloud-sdk
-          PYTHONPATH: $GCP_SDK_PATH/platform/google_appengine
+          PYTHONPATH: /usr/lib/google-cloud-sdk/platform/google_appengine
           GCLOUD_PROJECT: "bill-deploytest"
     steps:
       - checkout
