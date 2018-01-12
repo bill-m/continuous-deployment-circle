@@ -19,3 +19,10 @@ handlers:
 # temporary workaround around gcloud issue
 skip_files:
 - ^venv/.*$
+
+liveness_check:
+   check_interval_sec: 120
+   timeout_sec: 40
+   failure_threshold: 5
+   success_threshold: 5
+   initial_delay_sec: 500
