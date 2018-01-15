@@ -37,7 +37,7 @@ jobs:
               # deploy to AppEngine
               gcloud -q app deploy app.yaml --no-promote --version=${CIRCLE_BUILD_NUM}
               # Run our E2E Test against the latest version
-#              python e2e_test.py ${CIRCLE_BUILD_NUM}
+              # python e2e_test.py ${CIRCLE_BUILD_NUM}
               # Sanity test latest production version
               curl https://${CIRCLE_BUILD_NUM}-dot-tracfone-agent.appspot.com/ping
               # If OK, promote latest version
