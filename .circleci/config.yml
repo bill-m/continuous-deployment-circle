@@ -45,6 +45,16 @@ jobs:
               # Remove old versions
               bash .circleci/prune-gcp-versions.sh bill-deploytest 8
             fi
+      - run:
+          name: Cleanup on Error
+          when: on_fail
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+
+              # Make sure this version is deleted if there's an error
+              gcloud -q app versions delete --version=${CIRCLE_BUILD_NUM}
+            fi
+
 
 workflows:
   version: 2
