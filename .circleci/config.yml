@@ -52,7 +52,7 @@ jobs:
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
 
               # Make sure this version is deleted if there's an error
-              gcloud -q app versions delete --version=${CIRCLE_BUILD_NUM}
+              gcloud -q app versions delete ${CIRCLE_BUILD_NUM}
             fi
 
 
