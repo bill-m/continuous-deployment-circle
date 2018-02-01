@@ -39,7 +39,7 @@ jobs:
               # Run our E2E Test against the latest version
               # python e2e_test.py ${CIRCLE_BUILD_NUM}
               # Sanity test latest production version
-              curl https://${CIRCLE_BUILD_NUM}-dot-tracfone-agent.xxxappspot.com/ping
+              curl https://${CIRCLE_BUILD_NUM}-dot-tracfone-agent.appspot.com/ping
               # If OK, promote latest version
               gcloud -q app services set-traffic --splits ${CIRCLE_BUILD_NUM}=1
               # Remove old versions
