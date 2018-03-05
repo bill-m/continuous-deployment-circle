@@ -2,7 +2,7 @@
 # Delete old versions of an app in GCP, assumes current gloud account has necessary rights
 #
 # Usage:
-# ./prune-gcp-versions.sh [gcpproj] [number to keep]
+# ./prune-gcp-versions.sh ProjectID [number to keep]
 # * where [gcpproj] is the target project in GCP
 # * where [number to keep] is the number of versions to keep, defaults to 3
 
@@ -10,7 +10,8 @@
 if [ "$1" != "" ]; then
     gcpproj=$1
 else
-    gcpproj="bill-deploytest"
+    echo "Must specify project"
+	exit 1
 fi
 
 if [ "$2" != "" ]; then
@@ -34,7 +35,7 @@ do
     if [ $count -gt $numtokeep ]
     then
       echo "Deleting version $ver of $gcpproj"
-      gcloud app versions delete $ver --project $gcpproj -q
+      gcloud app versions delete foo --project $gcpproj -q
     else
       echo "Keeping version $ver of $gcpproj"
     fi
