@@ -50,6 +50,7 @@ jobs:
           name: Cleanup on Error
           when: on_fail
           command: |
+            echo "$NEW_VER_DEPLOYED"
             if [ "${CIRCLE_BRANCH}" == "master" ] && [ "$NEW_VER_DEPLOYED" != "true" ]; then
               # Make sure this version is deleted if there's an error
               gcloud -q app versions delete ${CIRCLE_BUILD_NUM}
