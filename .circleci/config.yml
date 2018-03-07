@@ -42,7 +42,7 @@ jobs:
               curl https://${CIRCLE_BUILD_NUM}-dot-tracfone-agent.appspot.com/ping
               # If OK, promote latest version
               gcloud -q app services set-traffic --splits ${CIRCLE_BUILD_NUM}=1
-              echo 'export NEW_VER_DEPLOYED=true' >> $BASH_ENV
+              #echo 'export NEW_VER_DEPLOYED=true' >> $BASH_ENV
               # Remove old versions
               bash .circleci/prune-gcp-versions.sh bill-deploytest 8
             fi
