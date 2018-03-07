@@ -35,7 +35,7 @@ do
     if [ $count -gt $numtokeep ]
     then
       echo "Deleting version $ver of $gcpproj"
-      gcloud app versions delete foo --project asdf -q
+      gcloud app versions delete $ver --project $gcpproj -q
     else
       echo "Keeping version $ver of $gcpproj"
     fi
