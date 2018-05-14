@@ -2,7 +2,8 @@ version: 2
 jobs:
   build:
     docker:
-      - image: google/cloud-sdk
+      - image: direqteng/gcpbuildenv
+      - image: selenium/standalone-chrome:3.11.0
         environment:
           # Add app engine sdk to pythonpath for local unit tests.
           GCP_SDK_PATH: /usr/lib/google-cloud-sdk
@@ -38,6 +39,7 @@ jobs:
               gcloud -q app deploy app.yaml --no-promote --version=${CIRCLE_BUILD_NUM}
               # Run our E2E Test against the latest version
               # python e2e_test.py ${CIRCLE_BUILD_NUM}
+              protractor protractor.conf.production.js
               # Sanity test latest production version
               curl https://${CIRCLE_BUILD_NUM}-dot-tracfone-agent.appspot.com/ping
               # If OK, promote latest version
