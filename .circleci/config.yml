@@ -30,7 +30,7 @@ jobs:
           name: LocalTest
           command: |
             # run local unit tests
-            python test_main.py
+            # python test_main.py
       - deploy:
           name: Deploy Master to GCP
           command: |
