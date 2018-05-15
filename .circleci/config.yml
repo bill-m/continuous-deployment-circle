@@ -31,6 +31,12 @@ jobs:
           command: |
             # run local unit tests
             # python test_main.py
+      - run:
+          name: Install protractor
+          command: |
+            java -version
+            npm install -g protractor
+            webdriver-manager update
       - deploy:
           name: Deploy Master to GCP
           command: |
