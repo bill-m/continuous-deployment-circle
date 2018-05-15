@@ -2,8 +2,8 @@ version: 2
 jobs:
   build:
     docker:
-      - image: direqteng/gcpbuildenv
       - image: selenium/standalone-chrome:3.11.0
+      - image: direqteng/gcpbuildenv
         environment:
           # Add app engine sdk to pythonpath for local unit tests.
           GCP_SDK_PATH: /usr/lib/google-cloud-sdk
