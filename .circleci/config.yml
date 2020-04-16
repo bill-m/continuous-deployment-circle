@@ -1,6 +1,9 @@
 version: 2.1
 jobs:
   build-api:
+    branches:
+      only:
+        - master
     docker:
       - image: direqteng/gcpbuildenv
         environment:
@@ -15,7 +18,7 @@ jobs:
           name: CheckChangedFolders
           command: |
             LAST_COMMIT=$(git rev-parse HEAD~1)
-            API_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -v -E '^functions/')
+            (API_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -v -E '^functions/')) || true
             echo $API_CHANGED
             if [ -z "$API_CHANGED" ]; then
               echo "api not updated, nothing to build."
@@ -53,6 +56,9 @@ jobs:
               echo "gcloud -q app versions delete ${CIRCLE_BUILD_NUM}"
             fi
   build-functions:
+    branches:
+      only:
+        - master
     docker:
       - image: direqteng/gcpbuildenv
         environment:
@@ -63,7 +69,7 @@ jobs:
           name: CheckChangedFolders
           command: |
             LAST_COMMIT=$(git rev-parse HEAD~1)
-            FUNCTIONS_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -E '^functions/')
+            (FUNCTIONS_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -E '^functions/')) || true
             echo $FUNCTIONS_CHANGED
             if [ -z "$FUNCTIONS_CHANGED" ]; then
               echo "api not updated, nothing to build."
