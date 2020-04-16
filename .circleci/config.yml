@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  checkout:
+  build-api:
     docker:
       - image: direqteng/gcpbuildenv
         environment:
@@ -14,18 +14,14 @@ jobs:
           name: CheckChangedFolders
           command: |
             API_CHANGED=$(git diff --name-only origin/master..HEAD | grep -i -v -E '^functions/')
-            echo 'export API_CHANGED=$API_CHANGED' >> $BASH_ENV
-            FUNCTIONS_CHANGED=$(git diff --name-only origin/master..HEAD | grep -i -E '^functions/')
-            echo 'export FUNCTIONS_CHANGED=$FUNCTIONS_CHANGED' >> $BASH_ENV
-  build-api:
-      - run:
-          name: SetEnvVars
-          command: |
+            # echo 'export API_CHANGED=$API_CHANGED' >> $BASH_ENV
             if [ -z "$API_CHANGED" ]; then
               echo "api not updated, nothing to build."
               circleci-agent step halt
             fi
-
+      - run:
+          name: SetEnvVars
+          command: |
             # echo $CLIENT_SECRET | base64 --decode -i > ${HOME}/client-secret.json
             echo $PYTHONPATH
             echo $GLOBAL_SECRET | base64 --decode -i > ${HOME}/client-secret.json
@@ -55,31 +51,32 @@ jobs:
               gcloud -q app versions delete ${CIRCLE_BUILD_NUM}
             fi
   build-functions:
-    - run:
-      name: BuildFunctions
-      command: |
-        if [ -z "$FUNCTIONS_CHANGED" ]; then
-          echo "api not updated, nothing to build."
-          circleci-agent step halt
-        fi
-
-        echo "building functions"
-    - run:
-      name: DeployFunctions
-      command: |
-        echo "deploying functions"        
-
+    docker:
+      - image: direqteng/gcpbuildenv
+        environment:
+          GCLOUD_PROJECT: "bill-deploytest"
+    steps:
+      - checkout
+      - run:
+          name: CheckChangedFolders
+          command: |
+            FUNCTIONS_CHANGED=$(git diff --name-only origin/master..HEAD | grep -i -E '^functions/')
+            if [ -z "$FUNCTIONS_CHANGED" ]; then
+              echo "api not updated, nothing to build."
+              circleci-agent step halt
+            fi
+      - run:
+          name: BuildFunctions
+          command: |
+            echo "building functions"
+        - run:
+          name: DeployFunctions
+          command: |
+            echo "deploying functions"        
 
 workflows:
   version: 2
-  checkout:
+  build-all:
     jobs:
-      - checkout:
-  build:
-    jobs:
-      - build-api:
-        requires:
-          - checkout
-      - build-functions:
-        requires:
-          - checkout
+      - build-api
+      - build-functions
