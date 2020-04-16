@@ -69,7 +69,7 @@ jobs:
           name: BuildFunctions
           command: |
             echo "building functions"
-        - run:
+      - deploy:
           name: DeployFunctions
           command: |
             echo "deploying functions"        
