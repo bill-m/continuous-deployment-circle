@@ -15,9 +15,9 @@ jobs:
           name: CheckChangedFolders
           command: |
             LAST_COMMIT=$(git rev-parse HEAD~1)
-            git diff --name-only $LAST_COMMIT..HEAD
-            (API_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -v -E '^functions/')) || true
-            echo $API_CHANGED
+            echo "changed files: $(git diff --name-only $LAST_COMMIT..HEAD)"
+            API_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -v -E '^functions/') || true
+            echo "API_CHANGED: $API_CHANGED"
             if [ -z "$API_CHANGED" ]; then
               echo "api not updated, skipping build."
               circleci-agent step halt
@@ -58,15 +58,16 @@ jobs:
       - image: direqteng/gcpbuildenv
         environment:
           GCLOUD_PROJECT: "bill-deploytest"
+          TERM: xterm-256color
     steps:
       - checkout
       - run:
           name: CheckChangedFolders
           command: |
             LAST_COMMIT=$(git rev-parse HEAD~1)
-            git diff --name-only $LAST_COMMIT..HEAD
-            (FUNCTIONS_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -E '^functions/')) || true
-            echo $FUNCTIONS_CHANGED
+            echo "changed files: $(git diff --name-only $LAST_COMMIT..HEAD)"
+            FUNCTIONS_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -E '^functions/') || true
+            echo "FUNCTIONS_CHANGED: $FUNCTIONS_CHANGED"
             if [ -z "$FUNCTIONS_CHANGED" ]; then
               echo "functions not updated, skipping build."
               circleci-agent step halt
