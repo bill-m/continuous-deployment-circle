@@ -8,6 +8,7 @@ jobs:
           GCP_SDK_PATH: /usr/lib/google-cloud-sdk
           PYTHONPATH: /usr/lib/google-cloud-sdk/platform/google_appengine
           GCLOUD_PROJECT: "bill-deploytest"
+          TERM: xterm-256color
     steps:
       - checkout
       - run:
