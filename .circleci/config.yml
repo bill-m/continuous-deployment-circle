@@ -75,11 +75,11 @@ workflows:
   checkout:
     jobs:
       - checkout:
-  buil:
+  build:
     jobs:
-      - build-api
+      - build-api:
         requires:
           - checkout
-      - build-functions
+      - build-functions:
         requires:
           - checkout
