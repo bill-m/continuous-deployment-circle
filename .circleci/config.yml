@@ -1,9 +1,6 @@
 version: 2.1
 jobs:
   build-api:
-    branches:
-      only:
-        - master
     docker:
       - image: direqteng/gcpbuildenv
         environment:
@@ -56,9 +53,6 @@ jobs:
               echo "gcloud -q app versions delete ${CIRCLE_BUILD_NUM}"
             fi
   build-functions:
-    branches:
-      only:
-        - master
     docker:
       - image: direqteng/gcpbuildenv
         environment:
@@ -89,4 +83,12 @@ workflows:
   build-all:
     jobs:
       - build-api
+        filters:
+          branches:
+            only:
+              - master
       - build-functions
+        filters:
+          branches:
+            only:
+              - master
