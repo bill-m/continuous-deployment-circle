@@ -15,11 +15,12 @@ jobs:
           name: CheckChangedFolders
           command: |
             LAST_COMMIT=$(git rev-parse HEAD~1)
+            git diff --name-only $LAST_COMMIT..HEAD
             (API_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -v -E '^functions/')) || true
             echo $API_CHANGED
             if [ -z "$API_CHANGED" ]; then
               echo "api not updated, skipping build."
-              echo "circleci-agent step halt"
+              circleci-agent step halt
             fi
       - run:
           name: SetEnvVars
@@ -63,6 +64,7 @@ jobs:
           name: CheckChangedFolders
           command: |
             LAST_COMMIT=$(git rev-parse HEAD~1)
+            git diff --name-only $LAST_COMMIT..HEAD
             (FUNCTIONS_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -E '^functions/')) || true
             echo $FUNCTIONS_CHANGED
             if [ -z "$FUNCTIONS_CHANGED" ]; then
