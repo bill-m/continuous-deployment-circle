@@ -27,7 +27,7 @@ from api_key import key
 
 @app.route('/')
 def index():
-    return "Use the /get_author/<title> endpoint to get the author of a book."
+    return "Use /get_author/<title> to get the author of a book."
         
 
 # [START app]
