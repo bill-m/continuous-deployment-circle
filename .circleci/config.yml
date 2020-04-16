@@ -15,7 +15,6 @@ jobs:
           name: CheckChangedFolders
           command: |
             LAST_COMMIT=$(git rev-parse HEAD~1)
-            echo $(git diff --name-only $LAST_COMMIT..HEAD)
             API_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -v -E '^functions/')
             echo $API_CHANGED
             if [ -z "$API_CHANGED" ]; then
@@ -63,7 +62,8 @@ jobs:
       - run:
           name: CheckChangedFolders
           command: |
-            FUNCTIONS_CHANGED=$(git diff --name-only origin/master..HEAD | grep -i -E '^functions/')
+            LAST_COMMIT=$(git rev-parse HEAD~1)
+            FUNCTIONS_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -E '^functions/')
             echo $FUNCTIONS_CHANGED
             if [ -z "$FUNCTIONS_CHANGED" ]; then
               echo "api not updated, nothing to build."
@@ -83,4 +83,4 @@ workflows:
   build-all:
     jobs:
       - build-api
-      # - build-functions
+      - build-functions
