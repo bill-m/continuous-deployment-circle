@@ -1,6 +1,6 @@
-version: 2
+version: 2.1
 jobs:
-  build:
+  checkout:
     docker:
       - image: direqteng/gcpbuildenv
         environment:
@@ -8,51 +8,42 @@ jobs:
           GCP_SDK_PATH: /usr/lib/google-cloud-sdk
           PYTHONPATH: /usr/lib/google-cloud-sdk/platform/google_appengine
           GCLOUD_PROJECT: "bill-deploytest"
-      - image: selenium/standalone-chrome:3.11.0
     steps:
       - checkout
       - run:
+          name: CheckChangedFolders
+          command: |
+            API_CHANGED=$(git diff --name-only origin/master..HEAD | grep -i -v -E '^functions/')
+            echo 'export API_CHANGED=$API_CHANGED' >> $BASH_ENV
+            FUNCTIONS_CHANGED=$(git diff --name-only origin/master..HEAD | grep -i -E '^functions/')
+            echo 'export FUNCTIONS_CHANGED=$FUNCTIONS_CHANGED' >> $BASH_ENV
+  build-api:
+      - run:
           name: SetEnvVars
           command: |
+            if [ -z "$API_CHANGED" ]; then
+              echo "api not updated, nothing to build."
+              circleci-agent step halt
+            fi
+
             # echo $CLIENT_SECRET | base64 --decode -i > ${HOME}/client-secret.json
             echo $PYTHONPATH
             echo $GLOBAL_SECRET | base64 --decode -i > ${HOME}/client-secret.json
             sed  s/YOUR-API-KEY/$API_KEY/ api_key.py.sample > api_key.py
       - run:
-          name: PythonEnv
+          name: BuildApi
           command: |
-            mkdir -p lib
-            pip install -r requirements.txt -t lib
-            # authenticate and configure gcloud project
-            gcloud auth activate-service-account --key-file ${HOME}/client-secret.json
-            gcloud config set project $GCLOUD_PROJECT
+            echo "building api"
       - run:
           name: LocalTest
           command: |
             # run local unit tests
             # python test_main.py
-      - run:
-          name: Install protractor
-          command: |
-            java -version
-            npm install -g protractor
-            webdriver-manager update
       - deploy:
           name: Deploy Master to GCP
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              # deploy to AppEngine
-              gcloud -q app deploy app.yaml --no-promote --version=${CIRCLE_BUILD_NUM}
-              # Run our E2E Test against the latest version
-              # python e2e_test.py ${CIRCLE_BUILD_NUM}
-              protractor protractor.conf.production.js
-              # Sanity test latest production version
-              curl https://${CIRCLE_BUILD_NUM}-dot-tracfone-agent.appspot.com/ping
-              # If OK, promote latest version
-              gcloud -q app services set-traffic --splits ${CIRCLE_BUILD_NUM}=1
-              echo 'export NEW_VER_DEPLOYED=true' >> $BASH_ENV
-              # Remove old versions
-              bash .circleci/prune-gcp-versions.sh bill-deploytest 8
+              echo "deploy api"
             fi
       - run:
           name: Cleanup on Error
@@ -63,11 +54,32 @@ jobs:
               # Make sure this version is deleted if there's an error
               gcloud -q app versions delete ${CIRCLE_BUILD_NUM}
             fi
+  build-functions:
+    - run:
+      name: BuildFunctions
+      command: |
+        if [ -z "$FUNCTIONS_CHANGED" ]; then
+          echo "api not updated, nothing to build."
+          circleci-agent step halt
+        fi
+
+        echo "building functions"
+    - run:
+      name: DeployFunctions
+      command: |
+        echo "deploying functions"        
 
 
 workflows:
   version: 2
-  build_and_deploy:
+  checkout:
     jobs:
-      - build:
-          context: org-global
+      - checkout:
+  buil:
+    jobs:
+      - build-api
+        requires:
+          - checkout
+      - build-functions
+        requires:
+          - checkout
