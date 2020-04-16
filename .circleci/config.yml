@@ -18,7 +18,7 @@ jobs:
             (API_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -v -E '^functions/')) || true
             echo $API_CHANGED
             if [ -z "$API_CHANGED" ]; then
-              echo "api not updated, nothing to build."
+              echo "api not updated, skipping build."
               echo "circleci-agent step halt"
             fi
       - run:
@@ -66,7 +66,7 @@ jobs:
             (FUNCTIONS_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -E '^functions/')) || true
             echo $FUNCTIONS_CHANGED
             if [ -z "$FUNCTIONS_CHANGED" ]; then
-              echo "api not updated, nothing to build."
+              echo "functions not updated, skipping build."
               circleci-agent step halt
             fi
       - run:
