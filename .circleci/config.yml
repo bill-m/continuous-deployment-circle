@@ -13,9 +13,9 @@ jobs:
       - run:
           name: CheckChangedFolders
           command: |
+            git diff --name-only origin/master..HEAD
             API_CHANGED=$(git diff --name-only origin/master..HEAD | grep -i -v -E '^functions/')
             echo $API_CHANGED
-            # echo 'export API_CHANGED=$API_CHANGED' >> $BASH_ENV
             if [ -z "$API_CHANGED" ]; then
               echo "api not updated, nothing to build."
               echo "circleci-agent step halt"
@@ -81,4 +81,4 @@ workflows:
   build-all:
     jobs:
       - build-api
-      - build-functions
+      # - build-functions
