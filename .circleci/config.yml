@@ -17,9 +17,9 @@ jobs:
       - run:
           name: SetEnvVars
           command: |
-            echo $GCP_CONSOLE_SVC_ACCOUNT | base64 --decode -i > ${HOME}/client-secret.json
+            # echo $GCP_CONSOLE_SVC_ACCOUNT | base64 --decode -i > ${HOME}/client-secret.json
             # authenticate and configure gcloud project
-            gcloud auth activate-service-account --key-file ${HOME}/client-secret.json
+            # gcloud auth activate-service-account --key-file ${HOME}/client-secret.json
             gcloud config set project $GCLOUD_PROJECT
       - run:
           name: Build and Deploy to Staging
