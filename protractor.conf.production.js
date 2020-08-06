@@ -6,6 +6,6 @@
  * $ protractor protractor.conf.production.js
  */
 exports.config = {
-    seleniumAddress: 'http://localhost:4444/wd/hub',
-    specs: ['e2e/login-spec.js']
+  seleniumAddress: 'http://localhost:4444/wd/hub',
+  specs: ['e2e/e2egallerytest.spec.js'],
 };

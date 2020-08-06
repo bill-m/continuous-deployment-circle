@@ -1,95 +1,49 @@
-version: 2.1
+version: 2
 jobs:
-  build-api:
+  build:
+    branches:
+      only:
+        - master
     docker:
       - image: direqteng/gcpbuildenv
         environment:
           # Add app engine sdk to pythonpath for local unit tests.
-          GCP_SDK_PATH: /usr/lib/google-cloud-sdk
           PYTHONPATH: /usr/lib/google-cloud-sdk/platform/google_appengine
           GCLOUD_PROJECT: "bill-deploytest"
           TERM: xterm-256color
+      - image: selenium/standalone-chrome:3.11.0
     steps:
       - checkout
       - run:
-          name: CheckChangedFolders
-          command: |
-            LAST_COMMIT=$(git rev-parse HEAD~1)
-            API_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -v -E '^functions/') || true
-            echo "API_CHANGED: $API_CHANGED"
-            if [ -z "$API_CHANGED" ]; then
-              echo "api not updated, skipping build."
-              circleci-agent step halt
-            fi
-      - run:
           name: SetEnvVars
           command: |
-            # echo $CLIENT_SECRET | base64 --decode -i > ${HOME}/client-secret.json
-            echo $PYTHONPATH
-            echo $GLOBAL_SECRET | base64 --decode -i > ${HOME}/client-secret.json
-            sed  s/YOUR-API-KEY/$API_KEY/ api_key.py.sample > api_key.py
+            echo $GCP_CONSOLE_SVC_ACCOUNT | base64 --decode -i > ${HOME}/client-secret.json
+            # authenticate and configure gcloud project
+            gcloud auth activate-service-account --key-file ${HOME}/client-secret.json
+            gcloud config set project $GCLOUD_PROJECT
       - run:
-          name: BuildApi
+          name: Build and Deploy to Staging
           command: |
-            echo "building api"
+            npm install
+            npm run deploy-staging
       - run:
-          name: LocalTest
+          name: Install protractor
           command: |
-            # run local unit tests
-            # python test_main.py
-      - deploy:
-          name: Deploy Master to GCP
+            npm install -g protractor
+            webdriver-manager update
+      - run:
+          name: Test on staging
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              echo "deploy api"
-            fi
+            npm run test-staging
+      - run:
+          name: Deploy prod and sanity test
+          command: |
+            # npm run deploy
+            # npm run test-prod
       - run:
           name: Cleanup on Error
           when: on_fail
           command: |
-            echo "$NEW_VER_DEPLOYED"
-            if [ "${CIRCLE_BRANCH}" == "master" ] && [ "$NEW_VER_DEPLOYED" != "true" ]; then
-              # Make sure this version is deleted if there's an error
-              echo "gcloud -q app versions delete ${CIRCLE_BUILD_NUM}"
-            fi
-  build-functions:
-    docker:
-      - image: direqteng/gcpbuildenv
-        environment:
-          GCLOUD_PROJECT: "bill-deploytest"
-          TERM: xterm-256color
-    steps:
-      - checkout
-      - run:
-          name: CheckChangedFolders
-          command: |
-            LAST_COMMIT=$(git rev-parse HEAD~1)
-            FUNCTIONS_CHANGED=$(git diff --name-only $LAST_COMMIT..HEAD | grep -i -E '^functions/') || true
-            echo "FUNCTIONS_CHANGED: $FUNCTIONS_CHANGED"
-            if [ -z "$FUNCTIONS_CHANGED" ]; then
-              echo "functions not updated, skipping build."
-              circleci-agent step halt
-            fi
-      - run:
-          name: BuildFunctions
-          command: |
-            echo "building functions"
-      - deploy:
-          name: DeployFunctions
-          command: |
-            echo "deploying functions"        
-
-workflows:
-  version: 2
-  build-all:
-    jobs:
-      - build-api:
-        filters:
-          branches:
-            only:
-              - master
-      - build-functions:
-        filters:
-          branches:
-            only:
-              - master
+            # Make sure the new version is deleted if there's an error before deployment
+            # Temporarily remove so that we can manually test deployment
+            # gcloud -q app versions delete ${CIRCLE_BUILD_NUM}
