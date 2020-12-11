@@ -1,9 +1,8 @@
-version: 2
+version: 2.1
+orbs:
+  slack: circleci/slack@4.1.3
 jobs:
   build:
-    branches:
-      only:
-        - master
     docker:
       - image: direqteng/gcpbuildenv
         environment:
@@ -11,7 +10,7 @@ jobs:
           PYTHONPATH: /usr/lib/google-cloud-sdk/platform/google_appengine
           GCLOUD_PROJECT: "bill-deploytest"
           TERM: xterm-256color
-      - image: selenium/standalone-chrome:3.11.0
+      - image: selenium/standalone-chrome:latest
     steps:
       - checkout
       - run:
@@ -21,20 +20,21 @@ jobs:
             # authenticate and configure gcloud project
             # gcloud auth activate-service-account --key-file ${HOME}/client-secret.json
             gcloud config set project $GCLOUD_PROJECT
+            echo 'test: ' ${BILL-TEST}
       - run:
           name: Build and Deploy to Staging
           command: |
-            npm install
-            npm run deploy-staging
+            # npm install
+            # npm run deploy-staging
       - run:
           name: Install protractor
           command: |
-            npm install -g protractor
-            webdriver-manager update
+            #npm install -g protractor
+            # webdriver-manager update
       - run:
           name: Test on staging
           command: |
-            npm run test-staging
+            # npm run test-staging
       - run:
           name: Deploy prod and sanity test
           command: |
@@ -47,3 +47,15 @@ jobs:
             # Make sure the new version is deleted if there's an error before deployment
             # Temporarily remove so that we can manually test deployment
             # gcloud -q app versions delete ${CIRCLE_BUILD_NUM}
+
+workflows:
+  version: 2
+  build-all:
+    jobs:
+      - build:
+        filters:
+          branches:
+            context:
+              - slack-secrets
+            only:
+              - main
