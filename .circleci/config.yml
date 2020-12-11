@@ -20,8 +20,7 @@ jobs:
             # authenticate and configure gcloud project
             # gcloud auth activate-service-account --key-file ${HOME}/client-secret.json
             gcloud config set project $GCLOUD_PROJECT
-            echo 'BILL-TEST 1: ' ${BILL-TEST}
-            echo 'BILL-TEST 2: ' $BILL-TEST
+            echo 'BILL-TEST 2: ' ${BILL_TEST}
             echo 'QA_USERNAME: ' ${QA_USERNAME}
       - run:
           name: Build and Deploy to Staging
