@@ -55,7 +55,6 @@ workflows:
     jobs:
       - build:
           context: slack-secrets      
-        #filters:
-        #  branches:
-        #    only:
-        #      - main
+          filters:
+            branches:
+              only: main
