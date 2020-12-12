@@ -57,4 +57,4 @@ workflows:
           context: slack-secrets      
           filters:
             branches:
-              only: main
+              only: master
