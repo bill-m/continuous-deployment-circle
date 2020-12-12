@@ -20,7 +20,7 @@ jobs:
             # authenticate and configure gcloud project
             # gcloud auth activate-service-account --key-file ${HOME}/client-secret.json
             gcloud config set project $GCLOUD_PROJECT
-            echo 'BILL-TEST 2: ' ${BILL_TEST}
+            echo 'BILL_TEST 2: ' ${BILL_TEST}
             echo 'QA_USERNAME: ' ${QA_USERNAME}
       - run:
           name: Build and Deploy to Staging
@@ -56,6 +56,6 @@ workflows:
       - build:
         filters:
           branches:
-            context: slack-secrets
             only:
               - main
+            context: slack-secrets
